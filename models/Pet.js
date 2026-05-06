@@ -135,10 +135,15 @@ petSchema.methods.applyStatDecay = function() {
   const hoursPassed = Math.floor((now - lastDecay) / (1000 * 60 * 60));
   
   if (hoursPassed > 0) {
-    // Decay stats by 1 point per hour
-    this.hunger = Math.max(this.hunger - hoursPassed, 0);
-    this.happiness = Math.max(this.happiness - hoursPassed, 0);
-    this.energy = Math.max(this.energy - hoursPassed, 0);
+    // Decay stats by 5 points per hour (more noticeable)
+    this.hunger = Math.max(this.hunger - (hoursPassed * 5), 0);
+    this.happiness = Math.max(this.happiness - (hoursPassed * 5), 0);
+    this.energy = Math.max(this.energy - (hoursPassed * 5), 0);
+    
+    // Energy recovery: if hunger is above 50, recover energy
+    if (this.hunger > 50) {
+      this.energy = Math.min(this.energy + (hoursPassed * 3), 100);
+    }
     
     // Update last decay time
     this.lastStatDecayAt = now;

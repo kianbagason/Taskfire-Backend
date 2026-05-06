@@ -97,7 +97,6 @@ const feedPet = async (req, res) => {
   try {
     const { foodId } = req.body;
     const pet = await Pet.findOne({ user: req.user._id });
-    const user = await User.findById(req.user._id);
 
     if (!pet) {
       return res.status(404).json({ message: 'Pet not found' });
@@ -129,10 +128,9 @@ const feedPet = async (req, res) => {
     pet.happiness = Math.min(pet.happiness + 5, 100);
     pet.lastFedAt = new Date();
 
-    await user.save();
     await pet.save();
 
-    res.json({ pet, user, message: `Fed ${pet.name} with ${food.name}! 🍖` });
+    res.json({ pet, message: `Fed ${pet.name} with ${food.name}! 🍖` });
   } catch (error) {
     res.status(500).json({ 
       message: process.env.NODE_ENV === 'production' 
@@ -148,7 +146,6 @@ const playWithPet = async (req, res) => {
   try {
     const { toyId } = req.body;
     const pet = await Pet.findOne({ user: req.user._id });
-    const user = await User.findById(req.user._id);
 
     if (!pet) {
       return res.status(404).json({ message: 'Pet not found' });
@@ -205,10 +202,9 @@ const playWithPet = async (req, res) => {
       }
     }
 
-    await user.save();
     await pet.save();
 
-    res.json({ pet, user, message: `Played with ${pet.name} using ${toy.name}! 🎮` });
+    res.json({ pet, message: `Played with ${pet.name} using ${toy.name}! 🎮` });
   } catch (error) {
     res.status(500).json({ 
       message: process.env.NODE_ENV === 'production' 

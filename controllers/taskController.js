@@ -10,7 +10,7 @@ const updateStreak = async (userId, completedDate) => {
     return;
   }
 
-  console.log(`Before update - User: ${user.username}, Coins: ${user.coins}, TotalTasks: ${user.totalTasksCompleted}`);
+  console.log(`Before update - User: ${user.username}, Coins: ${user.coins}, TotalTasks: ${user.totalTasksCompleted}, CurrentStreak: ${user.currentStreak}`);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -23,29 +23,40 @@ const updateStreak = async (userId, completedDate) => {
   // Update streak logic (only once per day)
   if (!lastCompleted || lastCompleted.getTime() !== today.getTime()) {
     console.log('Updating streak (first task today or new day)');
+    
     // Calculate streak
     if (lastCompleted) {
-      const diffTime = Math.abs(today - lastCompleted);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffTime = today.getTime() - lastCompleted.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      console.log(`Last completed: ${lastCompleted.toDateString()}, Today: ${today.toDateString()}, Diff: ${diffDays} days`);
 
       if (diffDays === 1) {
-        // Consecutive day
+        // Consecutive day - increment streak
         user.currentStreak += 1;
-      } else {
-        // Streak broken
+        console.log(`✓ Consecutive day! Streak increased to ${user.currentStreak}`);
+      } else if (diffDays > 1) {
+        // Streak broken - reset to 1
+        console.log(`✗ Streak broken! ${diffDays} days since last task. Resetting to 1`);
         user.currentStreak = 1;
+      } else {
+        // Same day or earlier (shouldn't happen, but handle it)
+        console.log('Same day or error in date calculation');
       }
     } else {
       // First task completion ever
       user.currentStreak = 1;
+      console.log('🎉 First task ever! Starting streak at 1');
     }
 
     // Update longest streak
     if (user.currentStreak > user.longestStreak) {
       user.longestStreak = user.currentStreak;
+      console.log(`🏆 New longest streak: ${user.longestStreak} days!`);
     }
 
     user.lastCompletedDate = today;
+    console.log(`Updated lastCompletedDate to: ${today.toDateString()}`);
   } else {
     console.log('Streak already updated today, skipping streak update');
   }
